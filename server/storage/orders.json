@@ -1,0 +1,20 @@
+[
+  {
+    "orderId": "AP-ORD-891518",
+    "licenseKey": "AP-IRON-WILL-9759-B1-0CA039",
+    "downloadToken": "1617132d092d1bae22047b087d9c8d39f465292f6c80c59d",
+    "email": "test@example.com",
+    "edition": "Standard Archive",
+    "amount": 19,
+    "currency": "USD",
+    "status": "paid",
+    "paymentMethod": "card",
+    "createdAt": "2026-09-25T14:48:29.858Z",
+    "downloadCounts": {
+      "pdf": 1,
+      "epub": 0,
+      "plates": 0,
+      "receipt": 0
+    }
+  }
+]

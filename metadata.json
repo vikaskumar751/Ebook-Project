@@ -1,0 +1,6 @@
+{
+  "name": "ANIMESPROTOCOL // THE IRON WILL",
+  "description": "Digital archive and mental conditioning protocol for martial artists, creators, and builders. Complete codex, art plates, and audio frequencies.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
