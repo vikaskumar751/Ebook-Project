@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Eye, ShieldCheck, Download, Check } from 'lucide-react';
+import { DeploymentCodexCover, DEPLOYMENT_CODEX_SVG_DATA_URL } from './DeploymentCodexCover';
+import roninMindImg from '../assets/images/tactical_art_plate_1790215931738.jpg';
+import monolithTempleImg from '../assets/images/monolith_temple_art_1790215943671.jpg';
 
 interface ArchiveSectionProps {
   isDark: boolean;
@@ -17,22 +20,22 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
       id: 'plate-1',
       title: 'PLATE 01: THE RONIN MIND',
       resolution: '7680 × 4320 px (8K)',
-      src: '/src/assets/images/tactical_art_plate_1790215931738.jpg',
+      src: roninMindImg,
       caption: 'High-contrast ink rendering of cognitive discipline and martial isolation.'
     },
     {
       id: 'plate-2',
       title: 'PLATE 02: THE MONOLITH TEMPLE',
       resolution: '7680 × 4320 px (8K)',
-      src: '/src/assets/images/monolith_temple_art_1790215943671.jpg',
+      src: monolithTempleImg,
       caption: 'Brutalist concrete architecture of the sovereign training facility.'
     },
     {
       id: 'plate-3',
-      title: 'PLATE 03: CODEX COVER ART',
+      title: 'PLATE 03: THE DEPLOYMENT CODEX COVER',
       resolution: '8192 × 5464 px (Vector / CMYK)',
-      src: '/src/assets/images/codex_cover_art_1790215916343.jpg',
-      caption: 'Original exhibition cover layout with Swiss typographic grid.'
+      src: DEPLOYMENT_CODEX_SVG_DATA_URL,
+      caption: 'Official exhibition cover layout with Swiss typographic grid.'
     }
   ];
 
@@ -64,17 +67,13 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             {/* Book Cover Visual with Inspection Trigger */}
-            <div className="lg:col-span-4 shrink-0 relative group overflow-hidden border border-neutral-300 dark:border-neutral-700 bg-neutral-900 max-w-sm mx-auto lg:mx-0 w-full aspect-[3/4]">
-              <img
-                src="/src/assets/images/codex_cover_art_1790215916343.jpg"
-                alt="The Iron Will Codex Cover"
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <div className="lg:col-span-4 shrink-0 relative group overflow-hidden border border-neutral-300 dark:border-neutral-700 bg-neutral-900 max-w-sm mx-auto lg:mx-0 w-full shadow-2xl">
+              <DeploymentCodexCover />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none group-hover:pointer-events-auto">
                 <button
-                  onClick={() => setActiveArtModal('/src/assets/images/codex_cover_art_1790215916343.jpg')}
-                  className="bg-white text-black font-mono text-xs px-3.5 py-2 uppercase font-bold flex items-center gap-1.5 shadow-md cursor-pointer"
+                  type="button"
+                  onClick={() => setActiveArtModal('codex-cover')}
+                  className="bg-white hover:bg-[#FF0055] text-black hover:text-white font-mono text-xs px-3.5 py-2 uppercase font-bold flex items-center gap-1.5 shadow-md cursor-pointer transition-colors"
                 >
                   <Eye className="w-3.5 h-3.5" /> Inspect Full Cover
                 </button>
@@ -85,15 +84,15 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
             <div className="lg:col-span-8 space-y-5">
               <div>
                 <h3 className={`font-['Oswald'] font-bold text-2xl sm:text-3xl uppercase ${isDark ? 'text-white' : 'text-black'}`}>
-                  THE IRON WILL: COMPLETE TACTICAL MANUAL
+                  THE DEPLOYMENT CODEX
                 </h3>
                 <p className="font-mono text-xs text-neutral-500 uppercase mt-1">
-                  EDITION 00-184-PDF // AUTHORIZED FIELD PROTOCOL
+                  A FIELD MANUAL FOR THE DISCIPLINED CREATOR // EDITION 1.0
                 </p>
               </div>
 
               <p className={`font-['Space_Grotesk'] text-sm sm:text-base ${isDark ? 'text-neutral-300' : 'text-neutral-700'} leading-relaxed`}>
-                Written with surgical economy and zero motivational fluff. Contains seven comprehensive operational modules covering voluntary cold-adaptation, uninterrupted creation rituals, hormonal baseline optimization, and psychological resilience under duress.
+                Written with surgical economy and zero motivational fluff. Contains twelve operational chapters and twelve rules for the disciplined creator covering cold execution, uninterrupted deep focus rituals, sovereign craft, and resilience under duress.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 font-mono text-xs">
@@ -120,7 +119,7 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
                   onClick={() => onOpenCheckout?.()}
                   className="bg-[#E5094C] hover:bg-[#FF004D] text-white py-2.5 px-5 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
                 >
-                  Acquire Full Codex ($19) →
+                  Acquire The Deployment Codex ($19) →
                 </button>
               </div>
             </div>
@@ -149,17 +148,25 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
                 key={plate.id}
                 className={`border ${isDark ? 'bg-[#141414] border-neutral-800' : 'bg-white border-gray-200'} p-4 flex flex-col justify-between group`}
               >
-                <div className="relative overflow-hidden mb-4 bg-neutral-950 aspect-[4/3]">
-                  <img
-                    src={plate.src}
-                    alt={plate.title}
-                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    referrerPolicy="no-referrer"
-                  />
+                <div className="relative overflow-hidden mb-4 bg-neutral-950 aspect-[4/3] flex items-center justify-center">
+                  {plate.id === 'plate-3' ? (
+                    <div className="w-full h-full p-2 flex items-center justify-center bg-[#0C0D11]">
+                      <div className="w-2/3 h-full max-h-full">
+                        <DeploymentCodexCover className="p-3 text-[7px]" showScanlines={false} />
+                      </div>
+                    </div>
+                  ) : (
+                    <img
+                      src={plate.src}
+                      alt={plate.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button
-                      onClick={() => setActiveArtModal(plate.src)}
-                      className="bg-white text-black font-mono text-xs px-3 py-1.5 uppercase font-bold flex items-center gap-1.5 shadow cursor-pointer"
+                      onClick={() => setActiveArtModal(plate.id === 'plate-3' ? 'codex-cover' : plate.src)}
+                      className="bg-white text-black font-mono text-xs px-3 py-1.5 uppercase font-bold flex items-center gap-1.5 shadow cursor-pointer hover:bg-[#FF0055] hover:text-white transition-colors"
                     >
                       <Eye className="w-3.5 h-3.5" /> Enlarge Plate
                     </button>
@@ -185,15 +192,21 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
       {activeArtModal && (
         <div
           onClick={() => setActiveArtModal(null)}
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4 cursor-zoom-out"
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4 cursor-zoom-out"
         >
-          <div className="relative max-w-5xl max-h-[90vh]">
-            <img
-              src={activeArtModal}
-              alt="Archival Plate Inspection"
-              className="max-h-[85vh] max-w-full object-contain border border-neutral-700"
-            />
-            <p className="text-center font-mono text-xs text-neutral-400 mt-2 uppercase">
+          <div className="relative max-w-2xl w-full max-h-[92vh] flex flex-col items-center">
+            {activeArtModal === 'codex-cover' || activeArtModal === DEPLOYMENT_CODEX_SVG_DATA_URL ? (
+              <div className="w-full max-w-md shadow-2xl">
+                <DeploymentCodexCover />
+              </div>
+            ) : (
+              <img
+                src={activeArtModal}
+                alt="Archival Plate Inspection"
+                className="max-h-[85vh] max-w-full object-contain border border-neutral-700"
+              />
+            )}
+            <p className="text-center font-mono text-xs text-neutral-400 mt-3 uppercase">
               Click anywhere to close inspection
             </p>
           </div>
@@ -202,3 +215,4 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
     </section>
   );
 };
+

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1200" width="800" height="1200">
+  <defs>
+    <pattern id="scanlines" width="100" height="4" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="100" y2="0" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="1200" fill="#0C0D11"/>
+  <rect width="800" height="1200" fill="url(#scanlines)"/>
+  
+  <!-- Header -->
+  <text x="60" y="80" fill="#FF0055" font-family="monospace, Courier New" font-size="16" font-weight="bold" letter-spacing="3">ANIMESPROTOCOL // DEPLOYMENT CODEX</text>
+  <text x="740" y="80" text-anchor="end" fill="#8E929B" font-family="monospace, Courier New" font-size="16" letter-spacing="3">EDITION 1.0</text>
+  <line x1="60" y1="100" x2="740" y2="100" stroke="#21232B" stroke-width="1.5"/>
+
+  <!-- Title -->
+  <text x="60" y="460" fill="#7E8492" font-family="Impact, Arial Black, sans-serif" font-size="52" font-weight="bold" letter-spacing="2">THE</text>
+  <text x="60" y="550" fill="#F5F2EB" font-family="Impact, Arial Black, sans-serif" font-size="88" font-weight="bold" letter-spacing="1">DEPLOYMENT</text>
+  <text x="60" y="635" fill="#FF0055" font-family="Impact, Arial Black, sans-serif" font-size="88" font-weight="bold" letter-spacing="1">CODEX</text>
+
+  <!-- Red Accent Bar -->
+  <rect x="60" y="680" width="100" height="8" fill="#FF0055"/>
+
+  <!-- Subtitle -->
+  <text x="60" y="740" fill="#F5F2EB" font-family="monospace, Courier New" font-size="19" font-weight="bold" letter-spacing="3">A FIELD MANUAL FOR THE</text>
+  <text x="60" y="770" fill="#F5F2EB" font-family="monospace, Courier New" font-size="19" font-weight="bold" letter-spacing="3">DISCIPLINED CREATOR</text>
+
+  <text x="60" y="860" fill="#7E8492" font-family="monospace, Courier New" font-size="15" letter-spacing="3">TWELVE CHAPTERS. TWELVE RULES.</text>
+  <text x="60" y="890" fill="#7E8492" font-family="monospace, Courier New" font-size="15" letter-spacing="3">ONE CAMPAIGN.</text>
+
+  <!-- Footer -->
+  <line x1="60" y1="1080" x2="740" y2="1080" stroke="#21232B" stroke-width="1.5"/>
+  <text x="60" y="1120" fill="#FFFFFF" font-family="monospace, Courier New" font-size="15" font-weight="bold" letter-spacing="3">ANIMESPROTOCOL</text>
+  <text x="740" y="1120" text-anchor="end" fill="#7E8492" font-family="monospace, Courier New" font-size="15" letter-spacing="3">RESTRICTED // FIELD EDITION</text>
+  <rect x="394" y="1150" width="12" height="12" fill="#FF0055"/>
+</svg>

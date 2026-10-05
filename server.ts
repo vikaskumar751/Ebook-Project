@@ -756,6 +756,13 @@ All rights reserved. ANIMESPROTOCOL 2026.
     });
   });
 
+  // Serve static assets from public and src/assets for maximum deployment compatibility
+  const publicPath = path.resolve(__dirname, 'public');
+  const srcAssetsPath = path.resolve(__dirname, 'src/assets');
+  app.use(express.static(publicPath));
+  app.use('/src/assets', express.static(srcAssetsPath));
+  app.use('/assets', express.static(path.resolve(publicPath, 'assets')));
+
   // Mount Vite or serve static assets
   if (!isProd) {
     const vite = await createViteServer({
