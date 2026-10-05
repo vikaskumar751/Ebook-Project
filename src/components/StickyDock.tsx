@@ -3,11 +3,13 @@ import React from 'react';
 interface StickyDockProps {
   isDark: boolean;
   onOpenCheckout: () => void;
+  onOpenAdmin?: () => void;
 }
 
 export const StickyDock: React.FC<StickyDockProps> = ({
   isDark,
-  onOpenCheckout
+  onOpenCheckout,
+  onOpenAdmin
 }) => {
   return (
     <aside
@@ -18,7 +20,7 @@ export const StickyDock: React.FC<StickyDockProps> = ({
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         {/* Dock Left Info */}
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3 sm:space-x-4">
           <div>
             <h3 className={`font-['Oswald'] font-bold text-sm sm:text-base uppercase tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
               ANIMESPROTOCOL: THE IRON WILL
@@ -27,6 +29,16 @@ export const StickyDock: React.FC<StickyDockProps> = ({
               $19.00 USD // LIFETIME ACCESS
             </p>
           </div>
+
+          {onOpenAdmin && (
+            <button
+              onClick={onOpenAdmin}
+              className="text-[9px] sm:text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-1 text-[#E5094C] bg-[#E5094C]/10 border border-[#E5094C]/30 hover:bg-[#E5094C]/25 transition-colors cursor-pointer"
+              title="Open Admin Panel"
+            >
+              ADMIN
+            </button>
+          )}
 
           {/* Dock Tech Icons */}
           <div className="hidden sm:flex items-center space-x-2 text-neutral-400 pl-2 border-l border-gray-200 dark:border-neutral-800">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon, ShieldCheck } from 'lucide-react';
 
 interface NavigationProps {
   onOpenCheckout: () => void;
@@ -77,10 +77,12 @@ export const Navigation: React.FC<NavigationProps> = ({
 
           <button
             onClick={onOpenAdmin}
-            className={`hidden lg:inline-flex items-center text-[10px] font-mono uppercase tracking-wider py-1.5 px-2 text-[#E5094C] bg-[#E5094C]/10 border border-[#E5094C]/30 hover:bg-[#E5094C]/20 transition-colors cursor-pointer`}
-            title="Manage master PDF and EPUB files"
+            className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider py-1.5 px-2.5 text-[#E5094C] bg-[#E5094C]/10 border border-[#E5094C]/40 hover:bg-[#E5094C]/20 hover:border-[#E5094C] transition-colors cursor-pointer shadow-xs"
+            title="Open Admin Control Panel (Vault Files, Stripe/LemonSqueezy Webhooks, Orders)"
           >
-            VAULT ASSETS
+            <ShieldCheck className="w-3.5 h-3.5 text-[#E5094C]" />
+            <span className="hidden sm:inline">ADMIN PANEL</span>
+            <span className="sm:hidden">ADMIN</span>
           </button>
 
           <button
@@ -144,9 +146,10 @@ export const Navigation: React.FC<NavigationProps> = ({
                 setMobileMenuOpen(false);
                 onOpenAdmin();
               }}
-              className="w-full border border-[#E5094C]/40 text-[#E5094C] py-2 font-bold uppercase tracking-wider text-center"
+              className="w-full border-2 border-[#E5094C] bg-[#E5094C]/10 text-[#E5094C] py-2.5 font-bold uppercase tracking-wider text-center flex items-center justify-center gap-2 cursor-pointer hover:bg-[#E5094C]/20 transition-colors"
             >
-              VAULT ASSETS / STORAGE
+              <ShieldCheck className="w-4 h-4" />
+              <span>ADMIN CONTROL PANEL (VAULT & GATEWAYS)</span>
             </button>
             <button
               onClick={() => {

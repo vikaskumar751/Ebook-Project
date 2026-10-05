@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, FileText, BookOpen, HardDrive, CheckCircle2, AlertCircle, RefreshCw, Layers, ShieldCheck, Key, Mail, CreditCard } from 'lucide-react';
+import { X, Upload, FileText, BookOpen, HardDrive, CheckCircle2, AlertCircle, RefreshCw, Layers, ShieldCheck, Key, Mail, CreditCard, Copy, Check, ExternalLink } from 'lucide-react';
 import { droneEngine } from '../utils/audioSynth';
 
 interface AdminVaultModalProps {
@@ -22,6 +22,25 @@ interface StorageStatus {
   epub: FileStatus;
   plates: FileStatus;
   totalOrders: number;
+  gateways?: {
+    stripe: {
+      secretKeyConfigured: boolean;
+      webhookSecretConfigured: boolean;
+      webhookUrl: string;
+    };
+    lemonSqueezy: {
+      apiKeyConfigured: boolean;
+      webhookSecretConfigured: boolean;
+      webhookUrl: string;
+    };
+    razorpay: {
+      keyIdConfigured: boolean;
+      keySecretConfigured: boolean;
+      webhookSecretConfigured: boolean;
+      webhookUrl: string;
+      currency?: string;
+    };
+  };
 }
 
 export const AdminVaultModal: React.FC<AdminVaultModalProps> = ({
@@ -35,6 +54,14 @@ export const AdminVaultModal: React.FC<AdminVaultModalProps> = ({
   const [uploadingEpub, setUploadingEpub] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [copiedWebhook, setCopiedWebhook] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedWebhook(id);
+    droneEngine.playBeep(880, 0.1);
+    setTimeout(() => setCopiedWebhook(null), 2500);
+  };
 
   const fetchStatus = async () => {
     setLoading(true);
@@ -122,7 +149,7 @@ export const AdminVaultModal: React.FC<AdminVaultModalProps> = ({
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 bg-[#E5094C]"></span>
               <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#E5094C]">
-                BACKEND ARCHIVE VAULT & DEPLOYMENT SPECS
+                ADMIN CONTROL PANEL // INTERNAL MANAGEMENT
               </span>
             </div>
             <button
@@ -135,10 +162,10 @@ export const AdminVaultModal: React.FC<AdminVaultModalProps> = ({
             </button>
           </div>
           <h3 className="font-['Oswald'] font-bold text-2xl uppercase tracking-tight mt-1">
-            DIGITAL DELIVERABLE STORAGE & PRODUCTION REQUIREMENTS
+            FILE VAULT, PAYMENT GATEWAYS & PRODUCTION MANAGEMENT
           </h3>
           <p className="font-mono text-xs text-neutral-500 mt-1">
-            Manage your master PDF and EPUB files. When buyers complete payment, the backend immediately streams these exact files.
+            Upload final PDF/EPUB deliverables, configure live Stripe/LemonSqueezy webhooks, and inspect recorded customer purchases.
           </p>
         </div>
 
@@ -235,6 +262,269 @@ export const AdminVaultModal: React.FC<AdminVaultModalProps> = ({
                     <span>{uploadingEpub ? 'UPLOADING...' : 'REPLACE WITH YOUR FINAL .EPUB'}</span>
                   </div>
                 </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* PAYMENT GATEWAY & WEBHOOK CONFIGURATION (.ENV) */}
+        <div className="border-t border-gray-200 dark:border-neutral-800 pt-5 space-y-3 font-mono text-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <div className="font-bold uppercase tracking-wider text-black dark:text-white text-xs flex items-center gap-2">
+              <Key className="w-4 h-4 text-[#E5094C]" />
+              <span>PAYMENT GATEWAYS & WEBHOOK CONFIGURATION</span>
+            </div>
+            <div className="text-[10px] text-neutral-400">
+              TARGET FILE: <span className="font-bold text-[#E5094C]">/.env</span> (PROJECT ROOT)
+            </div>
+          </div>
+
+          <div className="p-3 bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-[11px] text-neutral-600 dark:text-neutral-400">
+            To enable real live credit card processing, add your secrets into the <strong className="text-black dark:text-white">.env</strong> file in your workspace root.
+            The server automatically verifies cryptographically signed webhooks and unlocks deliverable tokens upon successful payment.
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-[11px]">
+            {/* STRIPE CARD */}
+            <div className="p-3.5 border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-black space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="font-bold text-black dark:text-white flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#635BFF]"></span>
+                  <span>OPTION A: STRIPE</span>
+                </div>
+                <a
+                  href="https://dashboard.stripe.com/apikeys"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[10px] text-neutral-400 hover:text-white flex items-center gap-1 transition-colors"
+                >
+                  DASHBOARD <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              <div className="space-y-1.5 text-[10px]">
+                <div className="flex items-center justify-between py-1 border-b border-neutral-200 dark:border-neutral-900">
+                  <span className="text-neutral-400">STRIPE_SECRET_KEY</span>
+                  <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                    status?.gateways?.stripe.secretKeyConfigured
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-neutral-800 text-neutral-400'
+                  }`}>
+                    {status?.gateways?.stripe.secretKeyConfigured ? 'DETECTED IN .ENV' : 'NOT DETECTED'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-neutral-200 dark:border-neutral-900">
+                  <span className="text-neutral-400">STRIPE_WEBHOOK_SECRET</span>
+                  <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                    status?.gateways?.stripe.webhookSecretConfigured
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-neutral-800 text-neutral-400'
+                  }`}>
+                    {status?.gateways?.stripe.webhookSecretConfigured ? 'DETECTED IN .ENV' : 'NOT DETECTED'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <div className="text-[10px] text-neutral-400 mb-1">
+                  STRIPE WEBHOOK URL (Listen to: <code className="text-[#E5094C]">checkout.session.completed</code>)
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="text"
+                    readOnly
+                    value={status?.gateways?.stripe.webhookUrl || `${typeof window !== 'undefined' ? window.location.origin : ''}/api/webhooks/stripe`}
+                    className="flex-1 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 px-2 py-1 text-[10px] text-neutral-300 select-all font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(
+                      status?.gateways?.stripe.webhookUrl || `${window.location.origin}/api/webhooks/stripe`,
+                      'stripe'
+                    )}
+                    className="px-2 py-1 bg-neutral-200 dark:bg-neutral-800 hover:bg-[#E5094C] hover:text-white transition-colors cursor-pointer text-[10px] font-bold flex items-center gap-1 shrink-0"
+                  >
+                    {copiedWebhook === 'stripe' ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span>COPIED</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        <span>COPY</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* LEMON SQUEEZY CARD */}
+            <div className="p-3.5 border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-black space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="font-bold text-black dark:text-white flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#FFC233]"></span>
+                  <span>OPTION B: LEMON SQUEEZY</span>
+                </div>
+                <a
+                  href="https://app.lemonsqueezy.com/settings/api"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[10px] text-neutral-400 hover:text-white flex items-center gap-1 transition-colors"
+                >
+                  DASHBOARD <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              <div className="space-y-1.5 text-[10px]">
+                <div className="flex items-center justify-between py-1 border-b border-neutral-200 dark:border-neutral-900">
+                  <span className="text-neutral-400">LEMONSQUEEZY_API_KEY</span>
+                  <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                    status?.gateways?.lemonSqueezy.apiKeyConfigured
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-neutral-800 text-neutral-400'
+                  }`}>
+                    {status?.gateways?.lemonSqueezy.apiKeyConfigured ? 'DETECTED IN .ENV' : 'NOT DETECTED'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-neutral-200 dark:border-neutral-900">
+                  <span className="text-neutral-400">LEMONSQUEEZY_WEBHOOK_SECRET</span>
+                  <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                    status?.gateways?.lemonSqueezy.webhookSecretConfigured
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-neutral-800 text-neutral-400'
+                  }`}>
+                    {status?.gateways?.lemonSqueezy.webhookSecretConfigured ? 'DETECTED IN .ENV' : 'NOT DETECTED'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <div className="text-[10px] text-neutral-400 mb-1">
+                  LEMON SQUEEZY WEBHOOK URL (Listen to: <code className="text-[#E5094C]">order_created</code>)
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="text"
+                    readOnly
+                    value={status?.gateways?.lemonSqueezy.webhookUrl || `${typeof window !== 'undefined' ? window.location.origin : ''}/api/webhooks/lemonsqueezy`}
+                    className="flex-1 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 px-2 py-1 text-[10px] text-neutral-300 select-all font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(
+                      status?.gateways?.lemonSqueezy.webhookUrl || `${window.location.origin}/api/webhooks/lemonsqueezy`,
+                      'lemon'
+                    )}
+                    className="px-2 py-1 bg-neutral-200 dark:bg-neutral-800 hover:bg-[#E5094C] hover:text-white transition-colors cursor-pointer text-[10px] font-bold flex items-center gap-1 shrink-0"
+                  >
+                    {copiedWebhook === 'lemon' ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span>COPIED</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        <span>COPY</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* RAZORPAY INTERNATIONAL CARD */}
+            <div className="p-3.5 border border-neutral-300 dark:border-neutral-800 bg-neutral-50 dark:bg-black space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="font-bold text-black dark:text-white flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#0C2340] border border-[#0C2340] dark:border-blue-400"></span>
+                  <span className="text-[#0C2340] dark:text-blue-400">OPTION C: RAZORPAY</span>
+                </div>
+                <a
+                  href="https://dashboard.razorpay.com/app/keys"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[10px] text-neutral-400 hover:text-white flex items-center gap-1 transition-colors"
+                >
+                  DASHBOARD <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+
+              <div className="text-[10px] text-blue-500 font-bold tracking-wider">
+                INTERNATIONAL PAYMENTS ENABLED (USD)
+              </div>
+
+              <div className="space-y-1.5 text-[10px]">
+                <div className="flex items-center justify-between py-1 border-b border-neutral-200 dark:border-neutral-900">
+                  <span className="text-neutral-400">RAZORPAY_KEY_ID</span>
+                  <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                    status?.gateways?.razorpay?.keyIdConfigured
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-neutral-800 text-neutral-400'
+                  }`}>
+                    {status?.gateways?.razorpay?.keyIdConfigured ? 'DETECTED IN .ENV' : 'NOT DETECTED'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-neutral-200 dark:border-neutral-900">
+                  <span className="text-neutral-400">RAZORPAY_KEY_SECRET</span>
+                  <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                    status?.gateways?.razorpay?.keySecretConfigured
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-neutral-800 text-neutral-400'
+                  }`}>
+                    {status?.gateways?.razorpay?.keySecretConfigured ? 'DETECTED IN .ENV' : 'NOT DETECTED'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between py-1 border-b border-neutral-200 dark:border-neutral-900">
+                  <span className="text-neutral-400">RAZORPAY_WEBHOOK_SECRET</span>
+                  <span className={`px-1.5 py-0.5 text-[9px] font-bold uppercase ${
+                    status?.gateways?.razorpay?.webhookSecretConfigured
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-neutral-800 text-neutral-400'
+                  }`}>
+                    {status?.gateways?.razorpay?.webhookSecretConfigured ? 'DETECTED IN .ENV' : 'NOT DETECTED'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="pt-1">
+                <div className="text-[10px] text-neutral-400 mb-1">
+                  RAZORPAY WEBHOOK URL (Listen to: <code className="text-[#E5094C]">order.paid, payment.captured</code>)
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="text"
+                    readOnly
+                    value={status?.gateways?.razorpay?.webhookUrl || `${typeof window !== 'undefined' ? window.location.origin : ''}/api/webhooks/razorpay`}
+                    className="flex-1 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-800 px-2 py-1 text-[10px] text-neutral-300 select-all font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(
+                      status?.gateways?.razorpay?.webhookUrl || `${window.location.origin}/api/webhooks/razorpay`,
+                      'razorpay'
+                    )}
+                    className="px-2 py-1 bg-neutral-200 dark:bg-neutral-800 hover:bg-[#E5094C] hover:text-white transition-colors cursor-pointer text-[10px] font-bold flex items-center gap-1 shrink-0"
+                  >
+                    {copiedWebhook === 'razorpay' ? (
+                      <>
+                        <Check className="w-3 h-3 text-emerald-400" />
+                        <span>COPIED</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        <span>COPY</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

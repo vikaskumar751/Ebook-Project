@@ -107,9 +107,9 @@ export const Footer: React.FC<FooterProps> = ({ isDark, onOpenLookup, onOpenAdmi
                   <span className="text-neutral-400">•</span>
                   <button
                     onClick={onOpenAdmin}
-                    className="text-[#E5094C] hover:text-[#FF004D] font-bold transition-colors cursor-pointer"
+                    className="text-[#E5094C] hover:text-[#FF004D] font-bold transition-colors cursor-pointer uppercase underline underline-offset-4 decoration-[#E5094C]/40 hover:decoration-[#E5094C]"
                   >
-                    VAULT STORAGE / ADMIN
+                    ADMIN CONTROL PANEL
                   </button>
                 </>
               )}

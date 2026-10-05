@@ -22,7 +22,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   isDark
 }) => {
   const [email, setEmail] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'apple_pay' | 'crypto'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'razorpay' | 'apple_pay' | 'crypto'>('card');
   const [cardNumber, setCardNumber] = useState('4242 •••• •••• 4242');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -36,6 +36,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   if (!isOpen) return null;
 
   const price = 19.0;
+
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
 
   const triggerSuccessConfetti = () => {
     // Initial central burst
@@ -97,6 +111,101 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setErrorMessage(null);
     droneEngine.playBeep(440, 0.1);
 
+    // RAZORPAY INTERNATIONAL PAYMENT FLOW
+    if (paymentMethod === 'razorpay') {
+      try {
+        const loaded = await loadRazorpayScript();
+        if (!loaded) {
+          throw new Error('Unable to load Razorpay Checkout script. Check your internet connection.');
+        }
+
+        const orderRes = await fetch('/api/checkout/create-razorpay-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim() }),
+        });
+
+        const orderData = await orderRes.json();
+        if (!orderRes.ok || !orderData.success) {
+          throw new Error(orderData.error || 'Failed to initialize Razorpay transaction.');
+        }
+
+        const rzpOptions = {
+          key: orderData.keyId,
+          amount: orderData.amount,
+          currency: orderData.currency || 'USD',
+          name: 'ANIMESPROTOCOL',
+          description: 'The Iron Will (Vol 01 Archive)',
+          image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80',
+          order_id: orderData.orderId,
+          prefill: {
+            email: email.trim(),
+          },
+          theme: {
+            color: '#E5094C',
+          },
+          handler: async function (response: {
+            razorpay_order_id: string;
+            razorpay_payment_id: string;
+            razorpay_signature: string;
+          }) {
+            try {
+              setIsProcessing(true);
+              const verifyRes = await fetch('/api/checkout/verify-razorpay-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  email: email.trim(),
+                }),
+              });
+
+              const verifyData = await verifyRes.json();
+              if (!verifyRes.ok || !verifyData.success) {
+                throw new Error(verifyData.error || 'Razorpay payment signature verification failed.');
+              }
+
+              setOrderId(verifyData.order.orderId);
+              setLicenseKey(verifyData.order.licenseKey);
+              setDownloads(verifyData.downloads);
+              setIsComplete(true);
+              droneEngine.playBeep(880, 0.2);
+              triggerSuccessConfetti();
+            } catch (verErr: unknown) {
+              const msg = verErr instanceof Error ? verErr.message : 'Payment verification failed';
+              setErrorMessage(msg);
+              droneEngine.playBeep(240, 0.2);
+            } finally {
+              setIsProcessing(false);
+            }
+          },
+          modal: {
+            ondismiss: function () {
+              setIsProcessing(false);
+            },
+          },
+        };
+
+        const rzp = new (window as any).Razorpay(rzpOptions);
+        rzp.on('payment.failed', function (resp: { error?: { description?: string } }) {
+          setErrorMessage(resp?.error?.description || 'Razorpay transaction was not completed.');
+          setIsProcessing(false);
+          droneEngine.playBeep(240, 0.2);
+        });
+        rzp.open();
+        return;
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : 'Razorpay checkout encountered an error';
+        setErrorMessage(msg);
+        setIsProcessing(false);
+        droneEngine.playBeep(240, 0.2);
+        return;
+      }
+    }
+
+    // DIRECT / CARD PAYMENT FLOW
     try {
       const response = await fetch('/api/checkout/create-order', {
         method: 'POST',
@@ -232,25 +341,36 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <label className="block font-mono text-xs uppercase text-neutral-500 mb-1">
                   PAYMENT GATEWAY
                 </label>
-                <div className="grid grid-cols-3 gap-2 font-mono text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('razorpay')}
+                    className={`py-2 px-1 border text-center cursor-pointer transition-colors ${
+                      paymentMethod === 'razorpay'
+                        ? 'border-[#0C2340] dark:border-blue-400 bg-[#0C2340] dark:bg-blue-500/20 text-white font-bold'
+                        : 'border-neutral-300 dark:border-neutral-800 text-neutral-500 hover:text-black dark:hover:text-white'
+                    }`}
+                  >
+                    RAZORPAY INTL
+                  </button>
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('card')}
-                    className={`py-2 px-1 border text-center cursor-pointer ${
+                    className={`py-2 px-1 border text-center cursor-pointer transition-colors ${
                       paymentMethod === 'card'
                         ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black font-bold'
-                        : 'border-neutral-300 dark:border-neutral-800 text-neutral-500'
+                        : 'border-neutral-300 dark:border-neutral-800 text-neutral-500 hover:text-black dark:hover:text-white'
                     }`}
                   >
-                    CARD
+                    CARD (INSTANT)
                   </button>
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('apple_pay')}
-                    className={`py-2 px-1 border text-center cursor-pointer ${
+                    className={`py-2 px-1 border text-center cursor-pointer transition-colors ${
                       paymentMethod === 'apple_pay'
                         ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black font-bold'
-                        : 'border-neutral-300 dark:border-neutral-800 text-neutral-500'
+                        : 'border-neutral-300 dark:border-neutral-800 text-neutral-500 hover:text-black dark:hover:text-white'
                     }`}
                   >
                     APPLE / GOOGLE
@@ -258,16 +378,38 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('crypto')}
-                    className={`py-2 px-1 border text-center cursor-pointer ${
+                    className={`py-2 px-1 border text-center cursor-pointer transition-colors ${
                       paymentMethod === 'crypto'
                         ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black font-bold'
-                        : 'border-neutral-300 dark:border-neutral-800 text-neutral-500'
+                        : 'border-neutral-300 dark:border-neutral-800 text-neutral-500 hover:text-black dark:hover:text-white'
                     }`}
                   >
                     CRYPTO
                   </button>
                 </div>
               </div>
+
+              {/* Razorpay International Details */}
+              {paymentMethod === 'razorpay' && (
+                <div className="p-3.5 border border-blue-500/30 bg-blue-500/5 space-y-2 font-mono">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                      RAZORPAY INTERNATIONAL GATEWAY
+                    </span>
+                    <span className="text-[10px] text-neutral-400 font-bold">$19.00 USD</span>
+                  </div>
+                  <p className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                    Accepts international Visa, Mastercard, American Express, PayPal, UPI International, and NetBanking from 100+ countries with automatic currency conversion and immediate deliverable unlock.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5 pt-1 text-[9px] text-neutral-600 dark:text-neutral-400">
+                    <span className="px-1.5 py-0.5 border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-black">VISA / MASTERCARD / AMEX</span>
+                    <span className="px-1.5 py-0.5 border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-black">INTERNATIONAL UPI</span>
+                    <span className="px-1.5 py-0.5 border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-black">PAYPAL</span>
+                    <span className="px-1.5 py-0.5 border border-neutral-300 dark:border-neutral-800 bg-white dark:bg-black">PCI-DSS LEVEL 1</span>
+                  </div>
+                </div>
+              )}
 
               {/* Payment Details Input */}
               {paymentMethod === 'card' && (
@@ -330,6 +472,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </div>
               )}
 
+              {/* Error Message */}
+              {errorMessage && (
+                <div className="p-3 border border-red-500/50 bg-red-500/10 text-red-400 font-mono text-xs flex items-start gap-2">
+                  <span className="font-bold text-[#E5094C]">ALERT:</span>
+                  <div className="flex-1">{errorMessage}</div>
+                </div>
+              )}
+
               {/* Submit Button */}
               <div className="pt-2">
                 <button
@@ -339,7 +489,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 >
                   <Lock className="w-4 h-4" />
                   <span>
-                    {isProcessing ? 'AUTHORIZING & GENERATING VAULT...' : `AUTHORIZE PAYMENT — $${price.toFixed(2)} USD`}
+                    {isProcessing
+                      ? 'AUTHORIZING & GENERATING VAULT...'
+                      : paymentMethod === 'razorpay'
+                      ? 'PAY $19.00 VIA RAZORPAY INTERNATIONAL'
+                      : `AUTHORIZE PAYMENT — $${price.toFixed(2)} USD`}
                   </span>
                 </button>
               </div>

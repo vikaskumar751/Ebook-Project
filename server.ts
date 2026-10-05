@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
@@ -5,6 +6,8 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import multer from 'multer';
+import Stripe from 'stripe';
+import Razorpay from 'razorpay';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -180,14 +183,56 @@ function saveOrders(orders: OrderRecord[]) {
 // In-memory cache for fast lookup
 let ordersCache: OrderRecord[] = loadOrders();
 
+function registerNewOrder(email: string, paymentMethod = 'card', amount = 19.0): OrderRecord {
+  const orderId = `AP-ORD-${Math.floor(100000 + Math.random() * 900000)}`;
+  const randomSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
+  const licenseKey = `AP-IRON-WILL-${Math.floor(1000 + Math.random() * 9000)}-B1-${randomSuffix}`;
+  const downloadToken = crypto.randomBytes(24).toString('hex');
+
+  const newOrder: OrderRecord = {
+    orderId,
+    licenseKey,
+    downloadToken,
+    email: email.trim().toLowerCase(),
+    edition: 'Standard Archive',
+    amount,
+    currency: 'USD',
+    status: 'paid',
+    paymentMethod,
+    createdAt: new Date().toISOString(),
+    downloadCounts: {
+      pdf: 0,
+      epub: 0,
+      plates: 0,
+      receipt: 0,
+    },
+  };
+
+  ordersCache.unshift(newOrder);
+  saveOrders(ordersCache);
+  return newOrder;
+}
+
+// Extend Request type for rawBody
+interface RawBodyRequest extends Request {
+  rawBody?: Buffer;
+}
+
 async function startServer() {
   const app = express();
   const PORT = Number(process.env.PORT) || 3000;
   const isProd = process.env.NODE_ENV === 'production';
 
-  app.use(express.json());
+  // Enable rawBody preservation for cryptographic webhook signature verification
+  app.use(
+    express.json({
+      verify: (req: RawBodyRequest, _res, buf) => {
+        req.rawBody = buf;
+      },
+    })
+  );
 
-  // API ROUTE: Create Order / Checkout
+  // API ROUTE: Create Order / Direct Checkout
   app.post('/api/checkout/create-order', (req: Request, res: Response) => {
     const { email, paymentMethod = 'card' } = req.body;
 
@@ -195,32 +240,7 @@ async function startServer() {
       return res.status(400).json({ error: 'Valid delivery email address is required.' });
     }
 
-    const orderId = `AP-ORD-${Math.floor(100000 + Math.random() * 900000)}`;
-    const randomSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
-    const licenseKey = `AP-IRON-WILL-${Math.floor(1000 + Math.random() * 9000)}-B1-${randomSuffix}`;
-    const downloadToken = crypto.randomBytes(24).toString('hex');
-
-    const newOrder: OrderRecord = {
-      orderId,
-      licenseKey,
-      downloadToken,
-      email: email.trim().toLowerCase(),
-      edition: 'Standard Archive',
-      amount: 19.0,
-      currency: 'USD',
-      status: 'paid',
-      paymentMethod,
-      createdAt: new Date().toISOString(),
-      downloadCounts: {
-        pdf: 0,
-        epub: 0,
-        plates: 0,
-        receipt: 0,
-      },
-    };
-
-    ordersCache.unshift(newOrder);
-    saveOrders(ordersCache);
+    const newOrder = registerNewOrder(email, paymentMethod, 19.0);
 
     return res.json({
       success: true,
@@ -234,12 +254,306 @@ async function startServer() {
         createdAt: newOrder.createdAt,
       },
       downloads: {
-        pdf: `/api/download/pdf?token=${downloadToken}`,
-        epub: `/api/download/epub?token=${downloadToken}`,
-        plates: `/api/download/plates?token=${downloadToken}`,
-        receipt: `/api/download/receipt?token=${downloadToken}`,
+        pdf: `/api/download/pdf?token=${newOrder.downloadToken}`,
+        epub: `/api/download/epub?token=${newOrder.downloadToken}`,
+        plates: `/api/download/plates?token=${newOrder.downloadToken}`,
+        receipt: `/api/download/receipt?token=${newOrder.downloadToken}`,
       },
     });
+  });
+
+  // API ROUTE: Create Stripe Hosted Checkout Session
+  app.post('/api/checkout/create-stripe-session', async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+
+    if (!stripeKey) {
+      return res.status(400).json({
+        error: 'STRIPE_SECRET_KEY is not configured in .env yet.',
+        configured: false,
+      });
+    }
+
+    try {
+      const stripe = new Stripe(stripeKey);
+      const origin = req.headers.origin || process.env.APP_URL || `http://localhost:${PORT}`;
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        customer_email: email && typeof email === 'string' && email.includes('@') ? email : undefined,
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'ANIMESPROTOCOL: The Iron Will (Vol 01 Archive)',
+                description: 'Complete 184-Page PDF Field Manual + EPUB + 12 Archival 4K Art Plates',
+                images: ['https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80'],
+              },
+              unit_amount: 1900, // $19.00 USD
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${origin}/?checkout_success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${origin}/?checkout_canceled=true`,
+        metadata: {
+          product: 'the-iron-will-vol-01',
+          source: 'animesprotocol-web',
+        },
+      });
+
+      return res.json({
+        success: true,
+        url: session.url,
+        sessionId: session.id,
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to create Stripe checkout session';
+      console.error('Stripe session creation error:', err);
+      return res.status(500).json({ error: msg });
+    }
+  });
+
+  // API ROUTE: Stripe Webhook
+  // Webhook endpoint to configure in Stripe Dashboard: https://dashboard.stripe.com/webhooks
+  // URL: https://<YOUR_APP_URL>/api/webhooks/stripe
+  // Events to listen for: checkout.session.completed
+  app.post('/api/webhooks/stripe', async (req: RawBodyRequest, res: Response) => {
+    const sig = req.headers['stripe-signature'];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+
+    if (!webhookSecret || !stripeKey) {
+      console.warn('Stripe webhook received but STRIPE_WEBHOOK_SECRET or STRIPE_SECRET_KEY is missing.');
+      return res.status(400).send('Webhook secret or API key not configured');
+    }
+
+    if (!sig || !req.rawBody) {
+      return res.status(400).send('Missing signature or payload');
+    }
+
+    let event: Stripe.Event;
+
+    try {
+      const stripe = new Stripe(stripeKey);
+      event = stripe.webhooks.constructEvent(req.rawBody, sig, webhookSecret);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Invalid signature';
+      console.error(`⚠️ Webhook signature verification failed: ${msg}`);
+      return res.status(400).send(`Webhook Error: ${msg}`);
+    }
+
+    // Handle checkout session completion
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const customerEmail = session.customer_details?.email || session.customer_email;
+
+      if (customerEmail) {
+        console.log(`[Stripe Webhook] Verified payment for ${customerEmail}. Unlocking deliverables...`);
+        const amountTotal = session.amount_total ? session.amount_total / 100 : 19.0;
+        const newOrder = registerNewOrder(customerEmail, 'stripe', amountTotal);
+        console.log(`[Stripe Webhook] Order registered: ${newOrder.orderId} (License: ${newOrder.licenseKey})`);
+      }
+    }
+
+    return res.json({ received: true });
+  });
+
+  // API ROUTE: Lemon Squeezy Webhook
+  // Webhook endpoint to configure in Lemon Squeezy Dashboard: https://app.lemonsqueezy.com/settings/webhooks
+  // URL: https://<YOUR_APP_URL>/api/webhooks/lemonsqueezy
+  // Events to listen for: order_created
+  app.post('/api/webhooks/lemonsqueezy', (req: RawBodyRequest, res: Response) => {
+    const signature = req.headers['x-signature'] as string;
+    const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
+
+    if (!secret) {
+      console.warn('Lemon Squeezy webhook received but LEMONSQUEEZY_WEBHOOK_SECRET is not configured.');
+      return res.status(400).send('Webhook secret not configured');
+    }
+
+    if (!signature || !req.rawBody) {
+      return res.status(400).send('Missing signature or raw body');
+    }
+
+    // Verify HMAC-SHA256 signature
+    const hmac = crypto.createHmac('sha256', secret);
+    const digest = Buffer.from(hmac.update(req.rawBody).digest('hex'), 'utf8');
+    const signatureBuffer = Buffer.from(signature, 'utf8');
+
+    if (digest.length !== signatureBuffer.length || !crypto.timingSafeEqual(digest, signatureBuffer)) {
+      console.error('⚠️ Lemon Squeezy signature verification failed.');
+      return res.status(400).send('Invalid signature');
+    }
+
+    const payload = req.body;
+    const eventName = payload?.meta?.event_name;
+
+    if (eventName === 'order_created') {
+      const customerEmail = payload?.data?.attributes?.user_email;
+      const totalFormatted = payload?.data?.attributes?.total_formatted;
+      const amount = payload?.data?.attributes?.total ? payload.data.attributes.total / 100 : 19.0;
+
+      if (customerEmail) {
+        console.log(`[Lemon Squeezy Webhook] Order created for ${customerEmail} (${totalFormatted})`);
+        const newOrder = registerNewOrder(customerEmail, 'lemonsqueezy', amount);
+        console.log(`[Lemon Squeezy Webhook] Order registered: ${newOrder.orderId} (License: ${newOrder.licenseKey})`);
+      }
+    }
+
+    return res.json({ received: true });
+  });
+
+  // API ROUTE: Create Razorpay International Order
+  app.post('/api/checkout/create-razorpay-order', async (req: Request, res: Response) => {
+    const { email } = req.body;
+    const keyId = process.env.RAZORPAY_KEY_ID || process.env.VITE_RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!keyId || !keySecret) {
+      return res.status(400).json({
+        error: 'Razorpay keys (RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET) are not configured in .env yet.',
+        configured: false,
+      });
+    }
+
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ error: 'Valid delivery email address is required.' });
+    }
+
+    try {
+      const razorpay = new Razorpay({
+        key_id: keyId,
+        key_secret: keySecret,
+      });
+
+      // International payment in USD (1900 cents = $19.00 USD)
+      const options = {
+        amount: 1900,
+        currency: 'USD',
+        receipt: `AP_RCPT_${Date.now()}`,
+        notes: {
+          product: 'the-iron-will-vol-01',
+          customer_email: email.trim().toLowerCase(),
+        },
+      };
+
+      const order = await razorpay.orders.create(options);
+      return res.json({
+        success: true,
+        orderId: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        keyId,
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to create Razorpay order';
+      console.error('Razorpay order creation error:', err);
+      return res.status(500).json({ error: msg });
+    }
+  });
+
+  // API ROUTE: Verify Razorpay Payment Signature
+  app.post('/api/checkout/verify-razorpay-payment', (req: Request, res: Response) => {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email } = req.body;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!keySecret) {
+      return res.status(400).json({ error: 'RAZORPAY_KEY_SECRET is not configured in .env.' });
+    }
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ error: 'Missing Razorpay verification parameters.' });
+    }
+
+    // Cryptographic signature check: HMAC_SHA256(order_id + "|" + payment_id, secret)
+    const payload = `${razorpay_order_id}|${razorpay_payment_id}`;
+    const expectedSignature = crypto
+      .createHmac('sha256', keySecret)
+      .update(payload)
+      .digest('hex');
+
+    if (expectedSignature !== razorpay_signature) {
+      console.error('⚠️ Razorpay payment signature verification failed.');
+      return res.status(400).json({ error: 'Invalid Razorpay payment signature.' });
+    }
+
+    const customerEmail = email && typeof email === 'string' && email.includes('@')
+      ? email.trim().toLowerCase()
+      : 'customer@razorpay.international';
+
+    const newOrder = registerNewOrder(customerEmail, 'razorpay', 19.0);
+    console.log(`[Razorpay Payment Verified] Order registered: ${newOrder.orderId} (License: ${newOrder.licenseKey})`);
+
+    return res.json({
+      success: true,
+      order: {
+        orderId: newOrder.orderId,
+        licenseKey: newOrder.licenseKey,
+        downloadToken: newOrder.downloadToken,
+        email: newOrder.email,
+        amount: newOrder.amount,
+        currency: newOrder.currency,
+        createdAt: newOrder.createdAt,
+      },
+      downloads: {
+        pdf: `/api/download/pdf?token=${newOrder.downloadToken}`,
+        epub: `/api/download/epub?token=${newOrder.downloadToken}`,
+        plates: `/api/download/plates?token=${newOrder.downloadToken}`,
+        receipt: `/api/download/receipt?token=${newOrder.downloadToken}`,
+      },
+    });
+  });
+
+  // API ROUTE: Razorpay Webhook
+  // Webhook endpoint to configure in Razorpay Dashboard: https://dashboard.razorpay.com/app/webhooks
+  // URL: https://<YOUR_APP_URL>/api/webhooks/razorpay
+  // Events to listen for: order.paid, payment.captured
+  app.post('/api/webhooks/razorpay', (req: RawBodyRequest, res: Response) => {
+    const signature = req.headers['x-razorpay-signature'] as string;
+    const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    if (!secret) {
+      console.warn('Razorpay webhook received but RAZORPAY_WEBHOOK_SECRET is not configured.');
+      return res.status(400).send('Webhook secret not configured');
+    }
+
+    if (!signature || !req.rawBody) {
+      return res.status(400).send('Missing signature or raw body');
+    }
+
+    // Verify HMAC-SHA256 signature
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(req.rawBody)
+      .digest('hex');
+
+    if (expectedSignature !== signature) {
+      console.error('⚠️ Razorpay webhook signature verification failed.');
+      return res.status(400).send('Invalid signature');
+    }
+
+    const event = req.body?.event;
+    const payload = req.body?.payload;
+
+    if (event === 'order.paid' || event === 'payment.captured') {
+      const email =
+        payload?.payment?.entity?.email ||
+        payload?.order?.entity?.notes?.customer_email;
+      const amount = payload?.payment?.entity?.amount
+        ? payload.payment.entity.amount / 100
+        : 19.0;
+
+      if (email) {
+        console.log(`[Razorpay Webhook] Verified payment for ${email} (${amount} USD). Unlocking deliverables...`);
+        const newOrder = registerNewOrder(email, 'razorpay', amount);
+        console.log(`[Razorpay Webhook] Order registered: ${newOrder.orderId} (License: ${newOrder.licenseKey})`);
+      }
+    }
+
+    return res.json({ status: 'ok' });
   });
 
   // API ROUTE: Download Handler with token verification
@@ -363,7 +677,7 @@ All rights reserved. ANIMESPROTOCOL 2026.
   });
 
   // API ROUTE: Storage Status (shows if PDF/EPUB are uploaded, sizes, paths)
-  app.get('/api/admin/storage-status', (_req: Request, res: Response) => {
+  app.get('/api/admin/storage-status', (req: Request, res: Response) => {
     const getFileInfo = (filename: string) => {
       const filePath = path.resolve(BOOKS_DIR, filename);
       if (fs.existsSync(filePath)) {
@@ -385,12 +699,36 @@ All rights reserved. ANIMESPROTOCOL 2026.
       };
     };
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
     return res.json({
       storagePath: BOOKS_DIR,
       pdf: getFileInfo('the-iron-will.pdf'),
       epub: getFileInfo('the-iron-will.epub'),
       plates: getFileInfo('art-plates-4k.zip'),
       totalOrders: ordersCache.length,
+      gateways: {
+        stripe: {
+          secretKeyConfigured: Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY.length > 5),
+          webhookSecretConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET && process.env.STRIPE_WEBHOOK_SECRET.length > 5),
+          webhookUrl: `${baseUrl}/api/webhooks/stripe`,
+        },
+        lemonSqueezy: {
+          apiKeyConfigured: Boolean(process.env.LEMONSQUEEZY_API_KEY && process.env.LEMONSQUEEZY_API_KEY.length > 5),
+          webhookSecretConfigured: Boolean(process.env.LEMONSQUEEZY_WEBHOOK_SECRET && process.env.LEMONSQUEEZY_WEBHOOK_SECRET.length > 5),
+          webhookUrl: `${baseUrl}/api/webhooks/lemonsqueezy`,
+        },
+        razorpay: {
+          keyIdConfigured: Boolean(
+            (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_ID.length > 5) ||
+            (process.env.VITE_RAZORPAY_KEY_ID && process.env.VITE_RAZORPAY_KEY_ID.length > 5)
+          ),
+          keySecretConfigured: Boolean(process.env.RAZORPAY_KEY_SECRET && process.env.RAZORPAY_KEY_SECRET.length > 5),
+          webhookSecretConfigured: Boolean(process.env.RAZORPAY_WEBHOOK_SECRET && process.env.RAZORPAY_WEBHOOK_SECRET.length > 5),
+          webhookUrl: `${baseUrl}/api/webhooks/razorpay`,
+          currency: 'USD (International)',
+        },
+      },
     });
   });
 

@@ -33,6 +33,29 @@ export default function App() {
     }
   }, [isDark]);
 
+  // Handle URL query parameters (?admin=true, #admin, ?checkout_success=true)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('admin') === 'true' || window.location.hash === '#admin') {
+      setAdminVaultOpen(true);
+    }
+    if (params.get('checkout_success') === 'true') {
+      setCheckoutOpen(true);
+    }
+
+    // Keyboard shortcut: Shift + A toggles Admin Panel
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeTag = (e.target as HTMLElement)?.tagName;
+      if (['INPUT', 'TEXTAREA'].includes(activeTag)) return;
+      if (e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        setAdminVaultOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleOpenCheckout = () => {
     setCheckoutOpen(true);
   };
@@ -90,6 +113,7 @@ export default function App() {
       <StickyDock
         isDark={isDark}
         onOpenCheckout={handleOpenCheckout}
+        onOpenAdmin={() => setAdminVaultOpen(true)}
       />
 
       {/* Checkout & Instant Digital Delivery Vault Modal */}
