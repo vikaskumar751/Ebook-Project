@@ -38,11 +38,11 @@ export const Navigation: React.FC<NavigationProps> = ({
 
   return (
     <header className={`w-full ${isDark ? 'bg-[#0A0A0A]/95 border-neutral-800' : 'bg-white/95 border-gray-200'} backdrop-blur border-b sticky top-0 z-50 transition-colors duration-200`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 overflow-hidden">
         {/* Brand Logo / Wordmark */}
-        <a href="#" className="flex items-center space-x-2.5 group">
+        <a href="#" className="flex items-center space-x-2 group shrink-0">
           <span className="w-2.5 h-2.5 bg-[#FF004D] inline-block transform group-hover:scale-110 transition-transform duration-150"></span>
-          <span className={`font-['Oswald'] font-bold text-xl sm:text-2xl tracking-tighter ${isDark ? 'text-white' : 'text-black'} uppercase`}>
+          <span className={`font-['Oswald'] font-bold text-lg sm:text-2xl tracking-tighter ${isDark ? 'text-white' : 'text-black'} uppercase`}>
             ANIMESPROTOCOL
           </span>
         </a>
@@ -64,7 +64,7 @@ export const Navigation: React.FC<NavigationProps> = ({
         </nav>
 
         {/* Action Button & Theme Toggle */}
-        <div className="flex items-center space-x-2 sm:space-x-3">
+        <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
           <button
             onClick={onOpenLookup}
             className={`hidden sm:inline-flex items-center text-[11px] font-mono font-semibold uppercase tracking-wider py-2 px-2.5 border ${
@@ -77,18 +77,17 @@ export const Navigation: React.FC<NavigationProps> = ({
 
           <button
             onClick={onOpenAdmin}
-            className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider py-1.5 px-2.5 text-[#E5094C] bg-[#E5094C]/10 border border-[#E5094C]/40 hover:bg-[#E5094C]/20 hover:border-[#E5094C] transition-colors cursor-pointer shadow-xs"
+            className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-mono font-bold uppercase tracking-wider py-1.5 px-2.5 text-[#E5094C] bg-[#E5094C]/10 border border-[#E5094C]/40 hover:bg-[#E5094C]/20 hover:border-[#E5094C] transition-colors cursor-pointer shadow-xs"
             title="Open Admin Control Panel (Vault Files, Stripe/LemonSqueezy Webhooks, Orders)"
           >
             <ShieldCheck className="w-3.5 h-3.5 text-[#E5094C]" />
-            <span className="hidden sm:inline">ADMIN PANEL</span>
-            <span className="sm:hidden">ADMIN</span>
+            <span>ADMIN PANEL</span>
           </button>
 
           <button
             onClick={onToggleTheme}
             title={isDark ? 'Switch to Technical Light Canvas' : 'Switch to Tactical OLED Dark'}
-            className={`p-2 rounded-none border ${isDark ? 'border-neutral-800 text-neutral-300 hover:border-neutral-700' : 'border-gray-200 text-neutral-700 hover:border-gray-300'} transition-colors`}
+            className={`p-1.5 sm:p-2 rounded-none border ${isDark ? 'border-neutral-800 text-neutral-300 hover:border-neutral-700' : 'border-gray-200 text-neutral-700 hover:border-gray-300'} transition-colors cursor-pointer`}
             aria-label="Toggle visual mode"
           >
             {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
@@ -96,21 +95,15 @@ export const Navigation: React.FC<NavigationProps> = ({
 
           <button
             onClick={onOpenCheckout}
-            className="inline-flex items-center gap-1.5 bg-[#E5094C] hover:bg-[#FF004D] text-white text-xs font-mono font-bold uppercase tracking-wider py-2.5 px-4 rounded-none transition-colors duration-150 shadow-sm active:translate-y-px cursor-pointer"
+            className="inline-flex items-center gap-1 bg-[#E5094C] hover:bg-[#FF004D] text-white text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider py-1.5 px-2.5 sm:py-2.5 sm:px-4 rounded-none transition-colors duration-150 shadow-sm active:translate-y-px cursor-pointer"
           >
-            <span>ACQUIRE — $19</span>
-            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
-              <path
-                d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
-                fillRule="evenodd"
-              />
-            </svg>
+            <span>ACQUIRE $19</span>
           </button>
 
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`md:hidden p-2 border ${isDark ? 'border-neutral-800 text-white' : 'border-gray-200 text-black'}`}
+            className={`md:hidden p-1.5 sm:p-2 border ${isDark ? 'border-neutral-800 text-white' : 'border-gray-200 text-black'} cursor-pointer`}
             aria-label="Open navigation menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

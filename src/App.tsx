@@ -62,7 +62,7 @@ export default function App() {
 
   return (
     <div
-      className={`min-h-screen flex flex-col font-sans antialiased selection:bg-[#FF004D] selection:text-white transition-colors duration-200 ${
+      className={`min-h-screen w-full max-w-full overflow-x-hidden flex flex-col font-sans antialiased selection:bg-[#FF004D] selection:text-white transition-colors duration-200 ${
         isDark ? 'bg-[#0A0A0A] text-white' : 'bg-[#F7F7F6] text-[#0A0A0A]'
       }`}
     >
@@ -76,7 +76,7 @@ export default function App() {
       />
 
       {/* Main Content */}
-      <div className="flex-grow">
+      <div className="flex-grow w-full max-w-full overflow-x-hidden">
         {/* Hero with Pricing Card */}
         <Hero onOpenCheckout={handleOpenCheckout} isDark={isDark} />
 

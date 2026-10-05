@@ -71,11 +71,11 @@ export const SpecsSection: React.FC<SpecsSectionProps> = ({ isDark }) => {
         </div>
 
         {/* Cryptographic SHA-256 Hash Verifier Tool */}
-        <div className={`border ${isDark ? 'bg-[#141414] border-neutral-800' : 'bg-white border-gray-200'} p-6 sm:p-8 shadow-technical`}>
-          <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-neutral-800 mb-6">
+        <div className={`border ${isDark ? 'bg-[#141414] border-neutral-800' : 'bg-white border-gray-200'} p-4 sm:p-8 shadow-technical overflow-hidden`}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-gray-100 dark:border-neutral-800 mb-6 gap-3">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-[#E5094C]" />
-              <h3 className={`font-['Oswald'] font-bold text-xl uppercase ${isDark ? 'text-white' : 'text-black'}`}>
+              <ShieldCheck className="w-5 h-5 text-[#E5094C] shrink-0" />
+              <h3 className={`font-['Oswald'] font-bold text-lg sm:text-xl uppercase ${isDark ? 'text-white' : 'text-black'}`}>
                 ARCHIVE INTEGRITY CHECK (SHA-256)
               </h3>
             </div>
@@ -98,8 +98,8 @@ export const SpecsSection: React.FC<SpecsSectionProps> = ({ isDark }) => {
                 type="text"
                 value={inputHash}
                 onChange={(e) => setInputHash(e.target.value)}
-                placeholder="Paste checksum string here (or type 'test' to auto-fill official hash)"
-                className={`flex-1 font-mono text-xs p-3 border ${
+                placeholder="Paste checksum string here"
+                className={`w-full sm:flex-1 min-w-0 font-mono text-xs p-3 border ${
                   isDark
                     ? 'bg-neutral-900 border-neutral-700 text-white placeholder-neutral-600 focus:border-[#E5094C]'
                     : 'bg-[#F9F9F8] border-gray-300 text-black placeholder-neutral-400 focus:border-[#E5094C]'
@@ -108,13 +108,13 @@ export const SpecsSection: React.FC<SpecsSectionProps> = ({ isDark }) => {
               <button
                 type="button"
                 onClick={() => setInputHash(officialHash)}
-                className="px-3 py-3 border border-neutral-300 dark:border-neutral-700 font-mono text-xs uppercase text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white"
+                className="w-full sm:w-auto px-3 py-2.5 sm:py-3 border border-neutral-300 dark:border-neutral-700 font-mono text-xs uppercase text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white cursor-pointer"
               >
                 INSERT OFFICIAL
               </button>
               <button
                 type="submit"
-                className="bg-[#0A0A0A] dark:bg-white text-white dark:text-black hover:bg-[#E5094C] dark:hover:bg-[#E5094C] dark:hover:text-white px-6 py-3 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
+                className="w-full sm:w-auto bg-[#0A0A0A] dark:bg-white text-white dark:text-black hover:bg-[#E5094C] dark:hover:bg-[#E5094C] dark:hover:text-white px-6 py-2.5 sm:py-3 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
               >
                 VERIFY
               </button>

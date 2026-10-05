@@ -18,22 +18,23 @@ export const StickyDock: React.FC<StickyDockProps> = ({
       } backdrop-blur border-t shadow-md transition-colors duration-200`}
       data-purpose="floating-bottom-dock"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 overflow-hidden">
         {/* Dock Left Info */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          <div>
-            <h3 className={`font-['Oswald'] font-bold text-sm sm:text-base uppercase tracking-tight ${isDark ? 'text-white' : 'text-black'}`}>
-              ANIMESPROTOCOL: THE IRON WILL
+        <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 mr-1 sm:mr-2">
+          <div className="min-w-0">
+            <h3 className={`font-['Oswald'] font-bold text-xs sm:text-base uppercase tracking-tight truncate ${isDark ? 'text-white' : 'text-black'}`}>
+              <span className="sm:hidden">CODEX VOL. 01</span>
+              <span className="hidden sm:inline">ANIMESPROTOCOL: THE IRON WILL</span>
             </h3>
-            <p className="font-mono text-[10px] sm:text-xs text-neutral-500 uppercase tracking-wider">
-              $19.00 USD // LIFETIME ACCESS
+            <p className="font-mono text-[9px] sm:text-xs text-neutral-500 uppercase tracking-wider truncate">
+              $19.00 USD <span className="hidden sm:inline">// LIFETIME ACCESS</span>
             </p>
           </div>
 
           {onOpenAdmin && (
             <button
               onClick={onOpenAdmin}
-              className="text-[9px] sm:text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-1 text-[#E5094C] bg-[#E5094C]/10 border border-[#E5094C]/30 hover:bg-[#E5094C]/25 transition-colors cursor-pointer"
+              className="hidden sm:inline-block text-[9px] sm:text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-1 text-[#E5094C] bg-[#E5094C]/10 border border-[#E5094C]/30 hover:bg-[#E5094C]/25 transition-colors cursor-pointer"
               title="Open Admin Panel"
             >
               ADMIN
@@ -41,7 +42,7 @@ export const StickyDock: React.FC<StickyDockProps> = ({
           )}
 
           {/* Dock Tech Icons */}
-          <div className="hidden sm:flex items-center space-x-2 text-neutral-400 pl-2 border-l border-gray-200 dark:border-neutral-800">
+          <div className="hidden md:flex items-center space-x-2 text-neutral-400 pl-2 border-l border-gray-200 dark:border-neutral-800">
             <svg className="w-3.5 h-3.5 hover:text-black dark:hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <rect height="10" rx="2" strokeWidth="2" width="14" x="5" y="11"></rect>
               <path d="M8 11V7a4 4 0 018 0v4" strokeWidth="2"></path>
@@ -58,12 +59,12 @@ export const StickyDock: React.FC<StickyDockProps> = ({
         </div>
 
         {/* Dock Right CTA Button */}
-        <div>
+        <div className="shrink-0">
           <button
             onClick={onOpenCheckout}
-            className="inline-flex items-center gap-2 bg-[#E5094C] hover:bg-[#FF004D] text-white text-xs font-mono font-bold uppercase tracking-wider py-2.5 px-4 sm:px-6 transition-all duration-150 shadow-sm active:translate-y-px cursor-pointer"
+            className="inline-flex items-center gap-1.5 bg-[#E5094C] hover:bg-[#FF004D] text-white text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider py-2 px-3 sm:py-2.5 sm:px-6 transition-all duration-150 shadow-sm active:translate-y-px cursor-pointer"
           >
-            <span>ORDER ARCHIVE NOW</span>
+            <span>ORDER NOW</span>
             <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">
               <path
                 d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"
