@@ -184,33 +184,35 @@ export const ExcerptReader: React.FC<ExcerptReaderProps> = ({ isDark, onOpenChec
             </div>
 
             {/* Prev / Next Buttons */}
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-between pt-3 gap-2">
               <button
                 onClick={handlePrev}
                 disabled={currentPageIndex === 0}
-                className={`flex items-center gap-1 font-mono text-xs uppercase font-bold px-4 py-2.5 border transition-colors ${
+                className={`flex items-center gap-1 font-mono text-[11px] sm:text-xs uppercase font-bold px-3 sm:px-4 py-2 sm:py-2.5 border transition-colors ${
                   currentPageIndex === 0
-                    ? 'opacity-30 cursor-not-allowed border-transparent text-neutral-400'
-                    : 'border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white cursor-pointer bg-white dark:bg-black'
+                    ? 'opacity-30 cursor-not-allowed border-transparent text-neutral-400 dark:text-neutral-600'
+                    : 'border-neutral-400 dark:border-neutral-700 text-neutral-950 dark:text-white bg-white dark:bg-black hover:border-[#E5094C] hover:text-[#E5094C] cursor-pointer shadow-xs'
                 }`}
               >
-                <ChevronLeft className="w-4 h-4" /> PREV CHAPTER
+                <ChevronLeft className="w-3.5 h-3.5 shrink-0" />
+                <span>PREV CHAPTER</span>
               </button>
 
-              <span className="font-mono text-xs text-neutral-400">
+              <span className="font-mono text-xs font-bold text-neutral-800 dark:text-neutral-300 shrink-0">
                 {currentPageIndex + 1} / {EXCERPT_PAGES.length}
               </span>
 
               <button
                 onClick={handleNext}
                 disabled={currentPageIndex === EXCERPT_PAGES.length - 1}
-                className={`flex items-center gap-1 font-mono text-xs uppercase font-bold px-4 py-2.5 border transition-colors ${
+                className={`flex items-center gap-1 font-mono text-[11px] sm:text-xs uppercase font-bold px-3 sm:px-4 py-2 sm:py-2.5 border transition-colors ${
                   currentPageIndex === EXCERPT_PAGES.length - 1
-                    ? 'opacity-30 cursor-not-allowed border-transparent text-neutral-400'
-                    : 'border-neutral-300 dark:border-neutral-700 hover:border-black dark:hover:border-white cursor-pointer bg-white dark:bg-black'
+                    ? 'opacity-30 cursor-not-allowed border-transparent text-neutral-400 dark:text-neutral-600'
+                    : 'border-neutral-400 dark:border-neutral-700 text-neutral-950 dark:text-white bg-white dark:bg-black hover:border-[#E5094C] hover:text-[#E5094C] cursor-pointer shadow-xs'
                 }`}
               >
-                NEXT CHAPTER <ChevronRight className="w-4 h-4" />
+                <span>NEXT CHAPTER</span>
+                <ChevronRight className="w-3.5 h-3.5 shrink-0" />
               </button>
             </div>
           </div>

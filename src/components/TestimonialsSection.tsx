@@ -232,9 +232,13 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                   </div>
 
                   {/* Operational Impact Badge */}
-                  <div className="mt-3 p-2 border border-gray-100 dark:border-neutral-800 bg-[#F9F9F8] dark:bg-neutral-900/60 font-mono text-[10px] text-neutral-600 dark:text-neutral-400 flex items-center gap-1.5">
-                    <span className="text-[#E5094C] font-bold">IMPACT:</span>
-                    <span className="truncate">{item.impactMetric}</span>
+                  <div className={`mt-3 p-2.5 border ${
+                    isDark ? 'border-neutral-800 bg-neutral-900/60' : 'border-gray-300 bg-neutral-100/90'
+                  } font-mono text-[11px] flex flex-col xs:flex-row items-start xs:items-center gap-1`}>
+                    <span className="text-[#E5094C] font-extrabold uppercase shrink-0">IMPACT:</span>
+                    <span className={`font-semibold ${isDark ? 'text-neutral-200' : 'text-neutral-950'} break-words`}>
+                      {item.impactMetric}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -287,8 +291,11 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
                       <div className="font-mono text-xs text-neutral-500 uppercase mt-0.5">
                         {current.role} · <span className="text-[#E5094C]">{current.disciplineLabel}</span>
                       </div>
-                      <div className="font-mono text-[11px] text-neutral-400 mt-2">
-                        OUTCOME: {current.impactMetric}
+                      <div className={`font-mono text-xs mt-2 flex flex-wrap items-center gap-1.5 ${
+                        isDark ? 'text-neutral-200' : 'text-neutral-950'
+                      }`}>
+                        <span className="text-[#E5094C] font-bold">IMPACT / OUTCOME:</span>
+                        <span className="font-semibold">{current.impactMetric}</span>
                       </div>
                     </div>
 

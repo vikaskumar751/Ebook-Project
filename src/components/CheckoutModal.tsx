@@ -135,7 +135,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           amount: orderData.amount,
           currency: orderData.currency || 'USD',
           name: 'ANIMESPROTOCOL',
-          description: 'The Iron Will (Vol 01 Archive)',
+          description: 'The Deployment Codex (Vol 01 Archive)',
           image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80',
           order_id: orderData.orderId,
           prefill: {
@@ -302,16 +302,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <div className="text-[11px] text-[#E5094C] font-bold uppercase tracking-wider">
                     STANDARD ARCHIVE EDITION
                   </div>
-                  <div className="font-['Oswald'] text-xl font-bold text-neutral-900 dark:text-white mt-0.5">
-                    THE IRON WILL (VOL. 01)
+                  <div className="font-['Oswald'] text-xl font-bold text-neutral-950 dark:text-white mt-0.5">
+                    THE DEPLOYMENT CODEX (VOL. 01)
                   </div>
-                  <div className="text-[11px] text-neutral-600 dark:text-neutral-400 mt-1">
+                  <div className="text-[11px] text-neutral-800 dark:text-neutral-300 font-medium mt-1">
                     Instant Delivery: 184-Page PDF + EPUB Edition + 12 Archival 4K Plates + Perpetual DRM-Free License
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="font-['Oswald'] text-2xl font-bold text-[#E5094C]">$19.00</div>
-                  <div className="text-[10px] text-neutral-400 uppercase">USD ONE-TIME</div>
+                  <div className="text-[10px] text-neutral-700 dark:text-neutral-400 font-semibold uppercase">USD ONE-TIME</div>
                 </div>
               </div>
             </div>
@@ -319,7 +319,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             {/* Form */}
             <form onSubmit={handleCheckout} className="space-y-4">
               <div>
-                <label className="block font-mono text-xs uppercase text-neutral-500 mb-1">
+                <label className="block font-mono text-xs uppercase font-bold text-neutral-800 dark:text-neutral-300 mb-1">
                   DELIVERY EMAIL ADDRESS (PDF & EPUB DELIVERY)
                 </label>
                 <input
@@ -546,22 +546,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </div>
 
             {/* Generated License Certificate Box */}
-            <div className="border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 p-4 font-mono text-xs space-y-1.5">
-              <div className="flex justify-between items-center text-[10px] text-neutral-500 uppercase">
+            <div className="border border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 p-4 font-mono text-xs space-y-1.5 shadow-xs">
+              <div className="flex justify-between items-center text-[10px] text-neutral-700 dark:text-neutral-400 font-semibold uppercase">
                 <span>ORDER: {orderId}</span>
-                <span className="text-emerald-500 font-bold">LIFETIME ACCESS</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold">LIFETIME ACCESS</span>
               </div>
               <div className="font-bold text-[#E5094C] text-sm break-all">{licenseKey}</div>
-              <div className="text-[11px] text-neutral-400 pt-0.5">
-                REGISTERED TO: <span className="text-neutral-200">{email}</span>
+              <div className="text-[11px] text-neutral-700 dark:text-neutral-300 pt-0.5 font-medium">
+                REGISTERED TO: <span className="font-bold text-neutral-950 dark:text-white">{email}</span>
               </div>
             </div>
 
             {/* Direct Download Action Links */}
             <div className="space-y-2.5">
-              <div className="flex items-center justify-between font-mono text-xs font-bold uppercase text-neutral-500 mb-1">
+              <div className="flex items-center justify-between font-mono text-xs font-bold uppercase text-neutral-800 dark:text-neutral-300 mb-1">
                 <span>INSTANT DIGITAL DELIVERABLES:</span>
-                <span className="text-[10px] text-emerald-500 flex items-center gap-1">
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-bold">
                   <Sparkles className="w-3 h-3" /> READY FOR LOCAL STORAGE
                 </span>
               </div>
@@ -569,19 +569,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               {/* 1. PDF DOWNLOAD */}
               <a
                 href={downloads?.pdf || '#'}
-                download="ANIMESPROTOCOL-THE-IRON-WILL-VOL-01.pdf"
+                download="ANIMESPROTOCOL-THE-DEPLOYMENT-CODEX-VOL-01.pdf"
                 onClick={() => droneEngine.playBeep(1200, 0.05)}
-                className="w-full p-3.5 border-2 border-[#E5094C] hover:bg-[#E5094C]/10 flex items-center justify-between font-mono text-xs font-bold transition-all cursor-pointer bg-white dark:bg-black group"
+                className="w-full p-3.5 border-2 border-[#E5094C] hover:bg-[#E5094C]/10 flex items-center justify-between font-mono text-xs font-bold transition-all cursor-pointer bg-white dark:bg-black group shadow-xs"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded bg-[#E5094C]/20 text-[#E5094C] flex items-center justify-center font-bold">
                     PDF
                   </div>
                   <div>
-                    <div className="text-black dark:text-white group-hover:text-[#E5094C] transition-colors">
+                    <div className="text-neutral-950 dark:text-white group-hover:text-[#E5094C] transition-colors font-bold">
                       DOWNLOAD FIELD MANUAL (.PDF)
                     </div>
-                    <div className="text-[10px] font-normal text-neutral-400">
+                    <div className="text-[10px] font-medium text-neutral-600 dark:text-neutral-400">
                       184 Pages · Full Typographic Layout & Master Charts
                     </div>
                   </div>
@@ -592,24 +592,24 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               {/* 2. EPUB DOWNLOAD */}
               <a
                 href={downloads?.epub || '#'}
-                download="ANIMESPROTOCOL-THE-IRON-WILL-VOL-01.epub"
+                download="ANIMESPROTOCOL-THE-DEPLOYMENT-CODEX-VOL-01.epub"
                 onClick={() => droneEngine.playBeep(1100, 0.05)}
-                className="w-full p-3.5 border border-neutral-300 dark:border-neutral-700 hover:border-[#E5094C] flex items-center justify-between font-mono text-xs font-bold transition-all cursor-pointer bg-white dark:bg-black group"
+                className="w-full p-3.5 border border-neutral-300 dark:border-neutral-700 hover:border-[#E5094C] flex items-center justify-between font-mono text-xs font-bold transition-all cursor-pointer bg-white dark:bg-black group shadow-xs"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 flex items-center justify-center font-bold">
+                  <div className="w-8 h-8 rounded bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 flex items-center justify-center font-bold">
                     <BookOpen className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-black dark:text-white group-hover:text-[#E5094C] transition-colors">
+                    <div className="text-neutral-950 dark:text-white group-hover:text-[#E5094C] transition-colors font-bold">
                       DOWNLOAD E-READER EDITION (.EPUB)
                     </div>
-                    <div className="text-[10px] font-normal text-neutral-400">
+                    <div className="text-[10px] font-medium text-neutral-600 dark:text-neutral-400">
                       Optimized for Kindle, Apple Books, Kobo & Mobile
                     </div>
                   </div>
                 </div>
-                <Download className="w-5 h-5 text-neutral-400 group-hover:text-[#E5094C] transition-colors" />
+                <Download className="w-5 h-5 text-neutral-500 group-hover:text-[#E5094C] transition-colors" />
               </a>
 
               {/* 3. 4K ART PLATES */}
@@ -617,13 +617,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 href={downloads?.plates || '#'}
                 download="ANIMESPROTOCOL-4K-ART-PLATES.zip"
                 onClick={() => droneEngine.playBeep(1000, 0.05)}
-                className="w-full p-3 border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 flex items-center justify-between font-mono text-xs font-bold transition-all cursor-pointer bg-neutral-50 dark:bg-neutral-900/60"
+                className="w-full p-3 border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 flex items-center justify-between font-mono text-xs font-bold transition-all cursor-pointer bg-neutral-100 dark:bg-neutral-900/60 shadow-xs"
               >
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-[#E5094C]" />
-                  <span>12 ARCHIVAL ART PLATES (.ZIP ARCHIVE)</span>
+                  <span className="text-neutral-950 dark:text-white font-bold">12 ARCHIVAL ART PLATES (.ZIP ARCHIVE)</span>
                 </div>
-                <Download className="w-4 h-4 text-neutral-400" />
+                <Download className="w-4 h-4 text-neutral-500" />
               </a>
 
               {/* 4. LICENSE RECEIPT */}
@@ -631,13 +631,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 href={downloads?.receipt || '#'}
                 download={`LICENSE-${orderId}.txt`}
                 onClick={() => droneEngine.playBeep(900, 0.05)}
-                className="w-full p-3 border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 flex items-center justify-between font-mono text-xs font-bold transition-all cursor-pointer bg-neutral-50 dark:bg-neutral-900/60"
+                className="w-full p-3 border border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 dark:hover:border-neutral-600 flex items-center justify-between font-mono text-xs font-bold transition-all cursor-pointer bg-neutral-100 dark:bg-neutral-900/60 shadow-xs"
               >
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                  <span>DOWNLOAD CRYPTOGRAPHIC LICENSE & RECEIPT (.TXT)</span>
+                  <span className="text-neutral-950 dark:text-white font-bold">DOWNLOAD CRYPTOGRAPHIC LICENSE & RECEIPT (.TXT)</span>
                 </div>
-                <Download className="w-4 h-4 text-neutral-400" />
+                <Download className="w-4 h-4 text-neutral-500" />
               </a>
             </div>
 

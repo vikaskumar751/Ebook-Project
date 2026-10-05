@@ -77,36 +77,46 @@ export const TenetsSection: React.FC<TenetsSectionProps> = ({ isDark, onOpenChec
 
                 {/* Expanded Details */}
                 {isExpanded && (
-                  <div className="px-5 pb-6 sm:px-6 sm:pb-6 pt-2 border-t border-gray-100 dark:border-neutral-800 space-y-4">
+                  <div className="px-4 pb-6 sm:px-6 sm:pb-6 pt-2 border-t border-gray-100 dark:border-neutral-800 space-y-4">
                     {/* Core Rule Banner */}
-                    <div className="bg-[#E5094C]/10 border-l-2 border-[#E5094C] p-3">
-                      <div className="font-mono text-[10px] uppercase font-bold text-[#E5094C] mb-1">
+                    <div className="bg-[#E5094C]/10 border-l-2 border-[#E5094C] p-3.5">
+                      <div className="font-mono text-[10px] sm:text-[11px] uppercase font-bold text-[#E5094C] mb-1 tracking-wider">
                         AXIOMATIC RULE
                       </div>
-                      <div className={`font-['Space_Grotesk'] text-sm font-semibold ${isDark ? 'text-neutral-200' : 'text-neutral-900'}`}>
+                      <div className={`font-['Space_Grotesk'] text-sm sm:text-base font-bold ${isDark ? 'text-white' : 'text-neutral-950'}`}>
                         "{tenet.coreRule}"
                       </div>
                     </div>
 
-                    <p className={`font-['Space_Grotesk'] text-sm leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-700'}`}>
+                    <p className={`font-['Space_Grotesk'] text-sm leading-relaxed ${isDark ? 'text-neutral-300' : 'text-neutral-800 font-medium'}`}>
                       {tenet.description}
                     </p>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                      <div className="border border-gray-200 dark:border-neutral-800 p-3 bg-neutral-50 dark:bg-neutral-900/40">
-                        <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-[#E5094C] uppercase mb-1">
-                          <Target className="w-3 h-3" /> DAILY OPERATIONAL DRILL
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-2">
+                      {/* Daily Operational Drill Box */}
+                      <div className={`border p-3.5 ${
+                        isDark ? 'border-neutral-800 bg-neutral-900/70 text-white' : 'border-gray-300 bg-white text-neutral-950 shadow-xs'
+                      }`}>
+                        <div className="flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold text-[#E5094C] uppercase mb-1.5 tracking-wider">
+                          <Target className="w-3.5 h-3.5 text-[#E5094C] shrink-0" />
+                          <span>DAILY OPERATIONAL DRILL</span>
                         </div>
-                        <p className="font-mono text-xs text-neutral-600 dark:text-neutral-400">
+                        <p className={`font-mono text-xs leading-relaxed font-semibold ${isDark ? 'text-neutral-200' : 'text-neutral-900'}`}>
                           {tenet.dailyDrill}
                         </p>
                       </div>
 
-                      <div className="border border-gray-200 dark:border-neutral-800 p-3 bg-neutral-50 dark:bg-neutral-900/40">
-                        <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-neutral-500 uppercase mb-1">
-                          <Zap className="w-3 h-3" /> MENTAL CATALYST
+                      {/* Mental Catalyst Box */}
+                      <div className={`border p-3.5 ${
+                        isDark ? 'border-neutral-800 bg-neutral-900/70 text-white' : 'border-gray-300 bg-white text-neutral-950 shadow-xs'
+                      }`}>
+                        <div className={`flex items-center gap-1.5 font-mono text-[11px] sm:text-xs font-bold uppercase mb-1.5 tracking-wider ${
+                          isDark ? 'text-amber-400' : 'text-neutral-900'
+                        }`}>
+                          <Zap className={`w-3.5 h-3.5 shrink-0 ${isDark ? 'text-amber-400' : 'text-[#E5094C]'}`} />
+                          <span>MENTAL CATALYST</span>
                         </div>
-                        <p className="font-mono text-xs italic text-neutral-600 dark:text-neutral-400">
+                        <p className={`font-mono text-xs italic leading-relaxed font-semibold ${isDark ? 'text-neutral-200' : 'text-neutral-900'}`}>
                           "{tenet.quote}"
                         </p>
                       </div>
