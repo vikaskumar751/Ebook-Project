@@ -128,7 +128,7 @@ export const ExcerptReader: React.FC<ExcerptReaderProps> = ({ isDark, onOpenChec
               <p
                 key={idx}
                 className={`font-['Space_Grotesk'] text-sm sm:text-base leading-relaxed ${
-                  isDark ? 'text-neutral-300' : 'text-neutral-800'
+                  isDark ? 'text-neutral-200' : 'text-neutral-950 font-normal'
                 }`}
               >
                 {paragraph}
@@ -138,7 +138,7 @@ export const ExcerptReader: React.FC<ExcerptReaderProps> = ({ isDark, onOpenChec
 
           {/* Callout Box */}
           {page.callout && (
-            <div className={`border-l-2 border-[#E5094C] p-4 my-6 ${isDark ? 'bg-neutral-900/60' : 'bg-white'} flex items-start justify-between gap-4`}>
+            <div className={`border-l-3 border-[#E5094C] p-4 my-6 ${isDark ? 'bg-neutral-900/60' : 'bg-white shadow-xs'} flex items-start justify-between gap-4`}>
               <div className="font-['Space_Grotesk'] text-base font-semibold text-[#E5094C] italic">
                 {page.callout}
               </div>
@@ -155,7 +155,7 @@ export const ExcerptReader: React.FC<ExcerptReaderProps> = ({ isDark, onOpenChec
           {/* Action Rule */}
           {page.ruleOfAction && (
             <div className="pt-4 border-t border-gray-200 dark:border-neutral-800 flex items-center justify-between font-mono text-xs">
-              <span className="text-neutral-600 dark:text-neutral-400 font-bold uppercase">
+              <span className={`${isDark ? 'text-neutral-300' : 'text-neutral-950'} font-bold uppercase`}>
                 {page.ruleOfAction}
               </span>
             </div>
@@ -169,12 +169,12 @@ export const ExcerptReader: React.FC<ExcerptReaderProps> = ({ isDark, onOpenChec
                 <button
                   key={i}
                   onClick={() => handleSelectChapter(i)}
-                  className={`shrink-0 px-2 py-1 font-mono text-[10px] font-bold uppercase transition-all cursor-pointer border ${
+                  className={`shrink-0 px-2.5 py-1.5 font-mono text-[11px] font-bold uppercase transition-all cursor-pointer border ${
                     i === currentPageIndex
                       ? 'bg-[#E5094C] text-white border-[#E5094C]'
                       : isDark
                       ? 'bg-neutral-900 text-neutral-400 border-neutral-800 hover:text-white hover:border-neutral-600'
-                      : 'bg-white text-neutral-600 border-gray-200 hover:text-black hover:border-gray-400'
+                      : 'bg-white text-neutral-900 border-gray-300 hover:text-black hover:border-gray-400 font-semibold'
                   }`}
                   title={p.chapterTitle}
                 >
@@ -190,15 +190,17 @@ export const ExcerptReader: React.FC<ExcerptReaderProps> = ({ isDark, onOpenChec
                 disabled={currentPageIndex === 0}
                 className={`flex items-center gap-1 font-mono text-[11px] sm:text-xs uppercase font-bold px-3 sm:px-4 py-2 sm:py-2.5 border transition-colors ${
                   currentPageIndex === 0
-                    ? 'opacity-30 cursor-not-allowed border-transparent text-neutral-400 dark:text-neutral-600'
-                    : 'border-neutral-400 dark:border-neutral-700 text-neutral-950 dark:text-white bg-white dark:bg-black hover:border-[#E5094C] hover:text-[#E5094C] cursor-pointer shadow-xs'
+                    ? 'opacity-30 cursor-not-allowed border-transparent text-neutral-400'
+                    : isDark
+                    ? 'border-neutral-700 text-white bg-black hover:border-[#E5094C] hover:text-[#E5094C] cursor-pointer'
+                    : 'border-neutral-400 text-neutral-950 bg-white hover:border-[#E5094C] hover:text-[#E5094C] cursor-pointer shadow-xs'
                 }`}
               >
                 <ChevronLeft className="w-3.5 h-3.5 shrink-0" />
                 <span>PREV CHAPTER</span>
               </button>
 
-              <span className="font-mono text-xs font-bold text-neutral-800 dark:text-neutral-300 shrink-0">
+              <span className={`font-mono text-xs font-bold ${isDark ? 'text-neutral-300' : 'text-neutral-900'} shrink-0`}>
                 {currentPageIndex + 1} / {EXCERPT_PAGES.length}
               </span>
 
@@ -207,8 +209,10 @@ export const ExcerptReader: React.FC<ExcerptReaderProps> = ({ isDark, onOpenChec
                 disabled={currentPageIndex === EXCERPT_PAGES.length - 1}
                 className={`flex items-center gap-1 font-mono text-[11px] sm:text-xs uppercase font-bold px-3 sm:px-4 py-2 sm:py-2.5 border transition-colors ${
                   currentPageIndex === EXCERPT_PAGES.length - 1
-                    ? 'opacity-30 cursor-not-allowed border-transparent text-neutral-400 dark:text-neutral-600'
-                    : 'border-neutral-400 dark:border-neutral-700 text-neutral-950 dark:text-white bg-white dark:bg-black hover:border-[#E5094C] hover:text-[#E5094C] cursor-pointer shadow-xs'
+                    ? 'opacity-30 cursor-not-allowed border-transparent text-neutral-400'
+                    : isDark
+                    ? 'border-neutral-700 text-white bg-black hover:border-[#E5094C] hover:text-[#E5094C] cursor-pointer'
+                    : 'border-neutral-400 text-neutral-950 bg-white hover:border-[#E5094C] hover:text-[#E5094C] cursor-pointer shadow-xs'
                 }`}
               >
                 <span>NEXT CHAPTER</span>
@@ -219,19 +223,19 @@ export const ExcerptReader: React.FC<ExcerptReaderProps> = ({ isDark, onOpenChec
         </div>
 
         {/* Read More Trigger Banner */}
-        <div className="mt-8 text-center bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-800 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-left">
-            <div className={`font-['Oswald'] font-bold text-lg uppercase ${isDark ? 'text-white' : 'text-black'}`}>
-              UNLOCK ALL 184 PAGES OF THE IRON WILL
+        <div className={`mt-8 text-left ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-gray-300 shadow-xs'} border p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
+          <div>
+            <div className={`font-['Oswald'] font-bold text-lg sm:text-xl uppercase ${isDark ? 'text-white' : 'text-neutral-950'}`}>
+              UNLOCK ALL 184 PAGES OF THE DEPLOYMENT CODEX
             </div>
-            <p className="font-mono text-xs text-neutral-500">
+            <p className={`font-mono text-xs ${isDark ? 'text-neutral-400' : 'text-neutral-800 font-medium'} mt-1`}>
               Immediate PDF/X-4 download, DRM-free local storage, full high-res vector plates.
             </p>
           </div>
 
           <button
             onClick={onOpenCheckout}
-            className="shrink-0 bg-[#E5094C] hover:bg-[#FF004D] text-white px-5 py-3 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer"
+            className="w-full sm:w-auto shrink-0 bg-[#E5094C] hover:bg-[#FF004D] text-white px-5 py-3 font-mono text-xs font-bold uppercase tracking-wider cursor-pointer text-center"
           >
             DOWNLOAD FULL CODEX ($19)
           </button>

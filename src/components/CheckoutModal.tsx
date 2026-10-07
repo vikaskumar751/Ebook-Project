@@ -285,7 +285,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </span>
               </div>
               <h3 className="font-['Oswald'] font-bold text-2xl uppercase tracking-tight">
-                ACQUIRE ANIMESPROTOCOL ARCHIVE
+                ACQUIRE THE DEPLOYMENT CODEX ARCHIVE
               </h3>
             </div>
 

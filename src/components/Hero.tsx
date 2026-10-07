@@ -41,7 +41,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenCheckout, isDark }) => {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 bg-[#E5094C] shrink-0"></span>
                 <h2 className="font-['Oswald'] font-bold text-xl sm:text-2xl tracking-tight uppercase">
-                  ANIMES PROTOCOL <span className="text-neutral-400 font-light">//</span> THE IRON WILL
+                  ANIMES PROTOCOL <span className="text-neutral-400 font-light">//</span> THE DEPLOYMENT CODEX
                 </h2>
               </div>
               <p className="font-mono text-[10px] sm:text-xs text-neutral-500 uppercase tracking-widest mt-1">

@@ -24,7 +24,7 @@ export const StickyDock: React.FC<StickyDockProps> = ({
           <div className="min-w-0">
             <h3 className={`font-['Oswald'] font-bold text-xs sm:text-base uppercase tracking-tight truncate ${isDark ? 'text-white' : 'text-black'}`}>
               <span className="sm:hidden">CODEX VOL. 01</span>
-              <span className="hidden sm:inline">ANIMESPROTOCOL: THE IRON WILL</span>
+              <span className="hidden sm:inline">ANIMESPROTOCOL: THE DEPLOYMENT CODEX</span>
             </h3>
             <p className="font-mono text-[9px] sm:text-xs text-neutral-500 uppercase tracking-wider truncate">
               $19.00 USD <span className="hidden sm:inline">// LIFETIME ACCESS</span>
