@@ -3,7 +3,7 @@ import { Eye, ShieldCheck, Download, Check } from 'lucide-react';
 import { DeploymentCodexCover, DEPLOYMENT_CODEX_SVG_DATA_URL } from './DeploymentCodexCover';
 import roninMindImg from '../assets/images/tactical_art_plate_1790215931738.jpg';
 import monolithTempleImg from '../assets/images/monolith_temple_art_1790215943671.jpg';
-import ironLotusImg from '../assets/images/iron_lotus_plate_1791348931905.jpg';
+import ironLotusImg from '../assets/images/iron_lotus.png';
 
 interface ArchiveSectionProps {
   isDark: boolean;
