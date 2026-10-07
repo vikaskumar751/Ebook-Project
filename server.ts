@@ -226,11 +226,37 @@ async function startServer() {
   // Enable rawBody preservation for cryptographic webhook signature verification
   app.use(
     express.json({
+      limit: '50mb',
       verify: (req: RawBodyRequest, _res, buf) => {
         req.rawBody = buf;
       },
     })
   );
+
+  // API ROUTE: Direct Custom Art Plate Upload (saves image file directly)
+  app.post('/api/upload-plate', (req: Request, res: Response) => {
+    try {
+      const { imageData, filename = 'iron_lotus.png' } = req.body;
+      if (!imageData || typeof imageData !== 'string') {
+        return res.status(400).json({ error: 'imageData base64 required' });
+      }
+      const base64Data = imageData.replace(/^data:image\/\w+;base64,/, '');
+      const buffer = Buffer.from(base64Data, 'base64');
+
+      const publicImgPath = path.resolve(process.cwd(), 'public/assets/images', filename);
+      const srcImgPath = path.resolve(process.cwd(), 'src/assets/images', filename);
+
+      fs.writeFileSync(publicImgPath, buffer);
+      if (fs.existsSync(path.dirname(srcImgPath))) {
+        fs.writeFileSync(srcImgPath, buffer);
+      }
+
+      return res.json({ success: true, url: `/assets/images/${filename}?t=${Date.now()}` });
+    } catch (err: any) {
+      console.error('Plate upload error:', err);
+      return res.status(500).json({ error: err.message });
+    }
+  });
 
   // API ROUTE: Create Order / Direct Checkout
   app.post('/api/checkout/create-order', (req: Request, res: Response) => {

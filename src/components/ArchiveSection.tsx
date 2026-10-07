@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Eye, ShieldCheck, Download, Check } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Eye, ShieldCheck, Download, Check, Upload } from 'lucide-react';
 import { DeploymentCodexCover, DEPLOYMENT_CODEX_SVG_DATA_URL } from './DeploymentCodexCover';
 import roninMindImg from '../assets/images/tactical_art_plate_1790215931738.jpg';
 import monolithTempleImg from '../assets/images/monolith_temple_art_1790215943671.jpg';
@@ -15,6 +15,40 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
   onOpenCheckout
 }) => {
   const [activeArtModal, setActiveArtModal] = useState<string | null>(null);
+  const [customPlate3, setCustomPlate3] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('animes_plate_3_custom');
+    if (saved) {
+      setCustomPlate3(saved);
+    }
+  }, []);
+
+  const handleUploadPlate3 = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result as string;
+      setCustomPlate3(dataUrl);
+      try {
+        localStorage.setItem('animes_plate_3_custom', dataUrl);
+      } catch (err) {
+        // quota exceeded fallback
+      }
+      try {
+        await fetch('/api/upload-plate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageData: dataUrl, filename: 'iron_lotus.png' }),
+        });
+      } catch (err) {
+        console.error('Server save error:', err);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const artPlates = [
     {
@@ -35,7 +69,7 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
       id: 'plate-3',
       title: 'PLATE 03: THE IRON LOTUS',
       resolution: '7680 × 4320 px (8K)',
-      src: ironLotusImg,
+      src: customPlate3 || ironLotusImg,
       caption: 'The contrast of organic beauty and synthetic hardware.'
     }
   ];
@@ -143,6 +177,15 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
             </span>
           </div>
 
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleUploadPlate3}
+            accept="image/*"
+            className="hidden"
+            aria-hidden="true"
+          />
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {artPlates.map((plate) => (
               <div
@@ -156,13 +199,26 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-2">
                     <button
                       onClick={() => setActiveArtModal(plate.src)}
                       className="bg-white text-black font-mono text-xs px-3 py-1.5 uppercase font-bold flex items-center gap-1.5 shadow cursor-pointer hover:bg-[#FF0055] hover:text-white transition-colors"
                     >
                       <Eye className="w-3.5 h-3.5" /> Enlarge Plate
                     </button>
+                    {plate.id === 'plate-3' && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          fileInputRef.current?.click();
+                        }}
+                        className="bg-neutral-900/90 text-white border border-neutral-600 hover:border-[#E5094C] hover:text-[#E5094C] font-mono text-[10px] px-2.5 py-1 uppercase font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                        title="Upload your exact image file"
+                      >
+                        <Upload className="w-3 h-3" /> Upload Custom File
+                      </button>
+                    )}
                   </div>
                 </div>
 
