@@ -3,6 +3,7 @@ import { Eye, ShieldCheck, Download, Check } from 'lucide-react';
 import { DeploymentCodexCover, DEPLOYMENT_CODEX_SVG_DATA_URL } from './DeploymentCodexCover';
 import roninMindImg from '../assets/images/tactical_art_plate_1790215931738.jpg';
 import monolithTempleImg from '../assets/images/monolith_temple_art_1790215943671.jpg';
+import ironLotusImg from '../assets/images/iron_lotus_plate_1791348931905.jpg';
 
 interface ArchiveSectionProps {
   isDark: boolean;
@@ -32,10 +33,10 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
     },
     {
       id: 'plate-3',
-      title: 'PLATE 03: THE DEPLOYMENT CODEX COVER',
-      resolution: '8192 × 5464 px (Vector / CMYK)',
-      src: DEPLOYMENT_CODEX_SVG_DATA_URL,
-      caption: 'Official exhibition cover layout with Swiss typographic grid.'
+      title: 'PLATE 03: THE IRON LOTUS',
+      resolution: '7680 × 4320 px (8K)',
+      src: ironLotusImg,
+      caption: 'The contrast of organic beauty and synthetic hardware.'
     }
   ];
 
@@ -146,26 +147,18 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
             {artPlates.map((plate) => (
               <div
                 key={plate.id}
-                className={`border ${isDark ? 'bg-[#141414] border-neutral-800' : 'bg-white border-gray-200'} p-4 flex flex-col justify-between group`}
+                className={`border ${isDark ? 'bg-[#141414] border-neutral-800' : 'bg-white border-gray-300 shadow-technical'} p-4 flex flex-col justify-between group`}
               >
                 <div className="relative overflow-hidden mb-4 bg-neutral-950 aspect-[4/3] flex items-center justify-center">
-                  {plate.id === 'plate-3' ? (
-                    <div className="w-full h-full p-2 flex items-center justify-center bg-[#0C0D11]">
-                      <div className="w-2/3 h-full max-h-full">
-                        <DeploymentCodexCover className="p-3 text-[7px]" showScanlines={false} />
-                      </div>
-                    </div>
-                  ) : (
-                    <img
-                      src={plate.src}
-                      alt={plate.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      referrerPolicy="no-referrer"
-                    />
-                  )}
+                  <img
+                    src={plate.src}
+                    alt={plate.title}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    referrerPolicy="no-referrer"
+                  />
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button
-                      onClick={() => setActiveArtModal(plate.id === 'plate-3' ? 'codex-cover' : plate.src)}
+                      onClick={() => setActiveArtModal(plate.src)}
                       className="bg-white text-black font-mono text-xs px-3 py-1.5 uppercase font-bold flex items-center gap-1.5 shadow cursor-pointer hover:bg-[#FF0055] hover:text-white transition-colors"
                     >
                       <Eye className="w-3.5 h-3.5" /> Enlarge Plate
@@ -175,10 +168,10 @@ export const ArchiveSection: React.FC<ArchiveSectionProps> = ({
 
                 <div>
                   <div className="font-mono text-[11px] text-neutral-500 uppercase">{plate.resolution}</div>
-                  <div className={`font-['Oswald'] font-bold text-base uppercase mt-1 ${isDark ? 'text-white' : 'text-black'}`}>
+                  <div className={`font-['Oswald'] font-bold text-base uppercase mt-1 ${isDark ? 'text-white' : 'text-neutral-950'}`}>
                     {plate.title}
                   </div>
-                  <p className="font-['Space_Grotesk'] text-xs text-neutral-500 mt-1">
+                  <p className={`font-['Space_Grotesk'] text-xs mt-1 ${isDark ? 'text-neutral-400' : 'text-neutral-700 font-medium'}`}>
                     {plate.caption}
                   </p>
                 </div>
